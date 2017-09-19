@@ -415,7 +415,7 @@ BOOL maximized = NO;
     }
     else {
         self.csPlayerAreaHeight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:CTRL_HEIGHT];
-        self.csPlayerAreaTop = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        self.csPlayerAreaTop = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.parent.topLayoutGuide attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0];
         self.csPlayerAreaLeft = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0];
         self.csPlayerAreaRight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0];
     }
