@@ -19,6 +19,6 @@
 @end
 @interface FlexibleVastPlayer : FlexiblePlayerLayerView
 - (void)loadVastResource:(VastEnt *)vast;
-- (void)close;
+- (void)close:(BOOL)instancePlay;
 @property (weak, nonatomic) id<FlexibleVastPlayerDelegate> delegate;
 @end

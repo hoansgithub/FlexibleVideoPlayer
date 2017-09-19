@@ -348,6 +348,7 @@ BOOL maximized = NO;
 
 - (void)loadVideo:(NSString *)urlString {
     [self.player pause];
+    [self.vastPlayerView close:NO];
     NSURL *url = [NSURL URLWithString:urlString];
     if (url) {
         [self maximize:YES];
@@ -457,12 +458,13 @@ BOOL maximized = NO;
 
 - (void)removeFromParent {
     [self.player pause];
+    [self.player replaceCurrentItemWithPlayerItem:nil];
     [self.parent.view removeConstraints:self.constraints];
     [self.view removeFromSuperview];
     [self.viewExtras removeFromSuperview];
     [self removeFromParentViewController];
     //remove ads
-    [self.vastPlayerView close];
+    [self.vastPlayerView close:NO];
 }
 
 - (void)maximize:(BOOL)animated {
@@ -586,7 +588,7 @@ BOOL maximized = NO;
 }
 
 - (void)vastPlayerWillEndPlaying:(FlexibleVastPlayer *)vastPlayer {
-    if (self.player.currentItem) {
+    if (self.player.currentItem && self.view.superview) {
         [self.player play];
     }
     self.btnSkipAds.hidden = YES;
@@ -599,14 +601,14 @@ BOOL maximized = NO;
 }
 
 - (void)vastPlayerDidReceiveTap:(FlexibleVastPlayer *)vastPlayer toUrl:(NSURL *)tapUrl {
-    [self.vastPlayerView close];
+    [self.vastPlayerView close:NO];
     if (![[UIApplication sharedApplication] openURL:tapUrl]) {
         NSLog(@"%@%@",@"Failed to open url:",[tapUrl description]);
     }
 }
 
 - (IBAction)didTapBtnSkipAd:(UIButton *)sender {
-    [self.vastPlayerView close];
+    [self.vastPlayerView close:YES];
 }
 
 @end

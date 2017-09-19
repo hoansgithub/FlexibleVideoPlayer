@@ -52,10 +52,10 @@
                     break;
                 case AVKeyValueStatusFailed:
                     //continue video
-                    [self close];
+                    [self close:YES];
                     break;
                 default:
-                    [self close];
+                    [self close:YES];
                     break;
             }
 
@@ -123,8 +123,8 @@
     [self removePeriodicTimeObserver];
 }
 
-- (void)close {
-    if (self.delegate) {
+- (void)close:(BOOL)instancePlay {
+    if (self.delegate && instancePlay) {
         [self.delegate vastPlayerWillEndPlaying:self];
     }
     self.hidden = YES;
@@ -148,7 +148,7 @@
 }
 
 - (void)playerItemDidPlayToEndTime : (NSNotification*) notif {
-    [self close];
+    [self close:YES];
 }
 
 
