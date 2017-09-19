@@ -18,6 +18,7 @@
 
 #define CTRL_HEIGHT  MIN(SCR_WIDTH, SCR_HEIGHT) * 0.5625f
 #define EXTRAS_HEIGHT MAX(SCR_WIDTH, SCR_HEIGHT) - CTRL_HEIGHT
+#define STATUS_BAR_HEIGHT [UIApplication sharedApplication].statusBarFrame.size.height
 
 #define CTRL_MINIMIZED_WIDTH SCR_WIDTH * 0.6
 #define CTRL_MINIMIZED_HEIGHT CTRL_MINIMIZED_WIDTH * 0.5625f
@@ -405,10 +406,21 @@ BOOL maximized = NO;
     [self.parent.view bringSubviewToFront:self.view];
     
     //add constraints
-    self.csPlayerAreaHeight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:CTRL_HEIGHT];
-    self.csPlayerAreaTop = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
-    self.csPlayerAreaLeft = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0];
-    self.csPlayerAreaRight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0];
+    
+    if (@available(iOS 11.0, *)) {
+        self.csPlayerAreaHeight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:CTRL_HEIGHT];
+        self.csPlayerAreaTop = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.parent.view.safeAreaLayoutGuide attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        self.csPlayerAreaLeft = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.parent.view.safeAreaLayoutGuide attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0];
+        self.csPlayerAreaRight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.parent.view.safeAreaLayoutGuide attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0];
+    }
+    else {
+        self.csPlayerAreaHeight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:CTRL_HEIGHT];
+        self.csPlayerAreaTop = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0];
+        self.csPlayerAreaLeft = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0];
+        self.csPlayerAreaRight = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0];
+    }
+    
+   
 
     [self didMoveToParentViewController:parent];
     
@@ -426,7 +438,12 @@ BOOL maximized = NO;
     self.csViewExtrasTop = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0];
     self.csViewExtrasLeft = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0.0];
     self.csViewExtrasRight = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.parent.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0.0];
-    self.csViewExtrasHeight = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:EXTRAS_HEIGHT];
+    if (@available(iOS 11.0, *)) {
+        self.csViewExtrasHeight = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:EXTRAS_HEIGHT - self.parent.view.safeAreaInsets.bottom - STATUS_BAR_HEIGHT];
+    }
+    else {
+        self.csViewExtrasHeight = [NSLayoutConstraint constraintWithItem:self.viewExtras attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeHeight multiplier:1.0 constant:EXTRAS_HEIGHT - STATUS_BAR_HEIGHT];
+    }
 
     self.constraints = [NSMutableArray arrayWithObjects:self.csPlayerAreaHeight, self.csPlayerAreaRight, self.csPlayerAreaLeft, self.csPlayerAreaTop, self.csViewExtrasTop, self.csViewExtrasLeft, self.csViewExtrasRight, self.csViewExtrasHeight, nil];
     
@@ -560,6 +577,7 @@ BOOL maximized = NO;
 
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    self.currentOrientation = toInterfaceOrientation;
     if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
         self.csPlayerAreaHeight.constant = MIN(SCR_WIDTH, SCR_HEIGHT);
         self.csPlayerAreaTop.constant = 0;
@@ -570,7 +588,6 @@ BOOL maximized = NO;
         self.csPlayerAreaHeight.constant = CTRL_HEIGHT;
     }
     [self maximize:YES];
-    self.currentOrientation = toInterfaceOrientation;
 }
 
 #pragma mark -FlexibleVastPlayerDelegate
